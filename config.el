@@ -1,4 +1,4 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -73,6 +73,7 @@
 ;;   `require' or `use-package'.
 ;; - `map!' for binding new keys
 ;;
+;;
 ;; To get information about any of these functions/macros, move the cursor over
 ;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
 ;; This will open documentation for it, including demos of how they are used.
@@ -82,11 +83,18 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 ;; haskell lint on save
-(setq haskell-stylish-on-save t)
 
+
+(setq haskell-stylish-on-save t)
+(dirvish-override-dired-mode)
 ;;org movement
 (after! org
   (map! :map org-mode-map
         :n "M-j" #'org-metadown
         :n "M-k" #'org-metaup)
+
+  (map! :n "M-k" #'drag-stuff-up
+        :n "M-j" #'drag-stuff-down
+        :v "M-j" #'drag-stuff-up
+        :v "M-j" #'drag-stuff-down)
   )
