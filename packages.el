@@ -59,5 +59,8 @@
 
 (package! clang-format)
 (package! nixfmt)
-
+(package! elm-mode)
+(package! elm-test-runner)
+(package! elm-yasnippets)
+(package! flycheck-elm)
 (package! dirvish)

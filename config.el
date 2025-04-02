@@ -91,10 +91,114 @@
 (after! org
   (map! :map org-mode-map
         :n "M-j" #'org-metadown
-        :n "M-k" #'org-metaup)
+        :n "M-k" #'org-metaup))
 
-  (map! :n "M-k" #'drag-stuff-up
-        :n "M-j" #'drag-stuff-down
-        :v "M-j" #'drag-stuff-up
-        :v "M-j" #'drag-stuff-down)
-  )
+(map! :n "M-k" #'drag-stuff-up
+      :n "M-j" #'drag-stuff-down
+      :v "M-j" #'drag-stuff-up
+      :v "M-j" #'drag-stuff-down)
+
+(use-package! emmet-mode
+  :hook ((html-mode . emmet-mode)
+         (css-mode . emmet-mode)
+         (web-mode . emmet-mode))
+  :config
+  (setq emmet-move-cursor-between-quotes t))
+
+(after! lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(html-mode . "html"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "vscode-html-language-server")
+                    :major-modes '(html-mode)
+                    :server-id 'html)))
+;; Company configuration for better completion
+(after! company
+  ;; Reduce the time after which the company auto-completion popup opens
+  (setq company-idle-delay 0.2)
+
+  ;; Reduce the number of characters before company kicks in
+  (setq company-minimum-prefix-length 1)
+
+  ;; Show numbers for completions
+  (setq company-show-numbers t)
+
+  ;; Make company completion start automatically
+  (setq company-auto-complete nil)
+
+  ;; Show company completion even for a single candidate
+  (setq company-require-match nil)
+
+  ;; Allow free typing even when completions are shown
+  (setq company-selection-wrap-around t)
+
+  ;; Show more candidates at once
+  (setq company-tooltip-limit 20)
+
+  ;; Add company dabbrev (buffer completions) to the completion backends
+  (add-to-list 'company-backends 'company-dabbrev)
+  (add-to-list 'company-backends 'company-dabbrev-code)
+
+  ;; Make dabbrev case-sensitive
+  (setq company-dabbrev-downcase nil)
+  (setq company-dabbrev-ignore-case nil)
+
+  ;; Use company capf (completion-at-point-functions) backend
+  (add-to-list 'company-backends 'company-capf)
+
+  ;; Align annotations to the right tooltip border
+  (setq company-tooltip-align-annotations t)
+
+  ;; Sort completions by usage frequency
+  (setq company-transformers '(company-sort-by-occurrence)))
+
+;; Enable company-mode globally
+(global-company-mode +1)
+
+;; Key bindings for company-mode
+(map! :i "C-@"    #'company-complete-common
+      :i "C-SPC"  #'company-complete-common
+      :i "C-n"    #'company-select-next
+      :i "C-p"    #'company-select-previous)
+
+(after! elm-mode
+  ;; Basic settings
+  (setq elm-format-on-save t
+        elm-sort-imports-on-save t)
+
+  ;; Add LSP hook
+  (add-hook 'elm-mode-hook 'lsp)
+
+  ;; Flycheck integration
+  (require 'flycheck-elm)
+  (add-hook 'flycheck-mode-hook #'flycheck-elm-setup)
+
+  ;; Test runner configuration
+  (when (featurep! :elm-test-runner)
+    (require 'elm-test-runner)
+    (map! :map elm-mode-map
+          :localleader
+          (:prefix ("t" . "test")
+                   "a" #'elm-test-runner-run-all-tests
+                   "c" #'elm-test-runner-run-tests-at-cursor
+                   "p" #'elm-test-runner-run-tests-in-file
+                   "r" #'elm-test-runner-rerun-previous)))
+
+  ;; Main keybindings
+  (map! :map elm-mode-map
+        :localleader
+        (:prefix ("e" . "elm")
+                 "b" #'elm-compile-buffer
+                 "m" #'elm-compile-main
+                 "p" #'elm-package-catalog
+                 "r" #'elm-repl-load
+                 "R" #'elm-repl-push
+                 "d" #'elm-documentation-lookup)))
+
+;; LSP-elm specific configuration
+(after! lsp-elm
+  (setq lsp-elm-elm-language-server-path "elm-language-server"
+        lsp-elm-elm-path "elm"
+        lsp-elm-elm-format-path "elm-format"))
+
+;; File template
+(set-file-template! "\\.elm$" :trigger "__.elm" :mode 'elm-mode)
