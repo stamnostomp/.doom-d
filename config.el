@@ -200,5 +200,6 @@
         lsp-elm-elm-path "elm"
         lsp-elm-elm-format-path "elm-format"))
 
+(use-package! lsp-tailwindcss :after lsp-mode)
 ;; File template
 (set-file-template! "\\.elm$" :trigger "__.elm" :mode 'elm-mode)
