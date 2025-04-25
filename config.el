@@ -231,8 +231,8 @@
 
   ;; Configure keybindings
   (map! :map dirvish-mode-map
-        :n "p" #'dirvish-toggle-preview
-        :n "TAB" #'dirvish-toggle-preview
+        :n "p" #'dirvish-preview-toggle  ;; Changed from dirvish-toggle-preview
+        :n "TAB" #'dirvish-preview-toggle ;; Changed from dirvish-toggle-preview
         :n "h" #'dired-up-directory
         :n "l" #'dired-find-file
         :n "f" #'dirvish-file-info-menu
