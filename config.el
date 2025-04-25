@@ -203,3 +203,39 @@
 (use-package! lsp-tailwindcss :after lsp-mode)
 ;; File template
 (set-file-template! "\\.elm$" :trigger "__.elm" :mode 'elm-mode)
+
+;; Dirvish preview configuration
+(after! dirvish
+  ;; Enable preview
+  (setq dirvish-preview-dispatchers
+        '(image-preview
+          gif-preview
+          video-preview
+          archive-preview
+          pdf-preview
+          html-preview
+          dir-info
+          info-preview
+          markdown-preview
+          org-preview
+          text-preview))
+
+  ;; Set preview delay
+  (setq dirvish-preview-delay 0.2)
+
+  ;; Set preview size (percentage of window)
+  (setq dirvish-preview-size 0.4)
+
+  ;; Show image properties in the preview
+  (setq dirvish-show-media-properties t)
+
+  ;; Configure keybindings
+  (map! :map dirvish-mode-map
+        :n "p" #'dirvish-toggle-preview
+        :n "TAB" #'dirvish-toggle-preview
+        :n "h" #'dired-up-directory
+        :n "l" #'dired-find-file
+        :n "f" #'dirvish-file-info-menu
+        :n "s" #'dirvish-quicksort
+        :n "v" #'dirvish-vc-menu
+        :n "y" #'dirvish-yank-menu))
