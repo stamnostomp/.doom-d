@@ -239,3 +239,39 @@
         :n "s" #'dirvish-quicksort
         :n "v" #'dirvish-vc-menu
         :n "y" #'dirvish-yank-menu))
+
+;; Emacs Everywhere configuration
+(use-package! emacs-everywhere
+  :config
+  ;; Set a different keybinding for the global shortcut
+  ;; (This is system-level and may require additional setup in your DE/WM)
+  (setq emacs-everywhere-key "Super-semicolon")  ; Super+;
+
+  ;; Set frame parameters
+  (setq emacs-everywhere-frame-parameters
+        '((name . "emacs-everywhere")
+          (width . 80)
+          (height . 24)
+          (minibuffer . t)
+          (menu-bar-lines . t)))
+
+  ;; Set major mode based on source application
+  (setq emacs-everywhere-major-mode-function #'org-mode)  ; Default to org-mode
+
+  ;; Application-specific major modes
+  (setq emacs-everywhere-app-classes
+        '(("Firefox" . markdown-mode)
+          ("Discord" . markdown-mode)
+          ("Slack" . markdown-mode)))
+
+  ;; Hook that runs before the frame is displayed
+  (add-hook 'emacs-everywhere-init-hooks
+            (defun my-emacs-everywhere-setup ()
+              ;; Enable spell-checking
+              (spell-fu-mode)
+              ;; Enable auto-save
+              (auto-save-visited-mode +1)
+              ;; Center content
+              (centered-window-mode)
+              ;; Disable line numbers (optional)
+              (display-line-numbers-mode -1))))
