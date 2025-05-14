@@ -48,7 +48,7 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
-
+(package! emacs-everywhere)
 (package! drag-stuff)
 (package! haskell-mode)
 (package! lsp-haskell)
