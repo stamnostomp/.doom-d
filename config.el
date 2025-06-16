@@ -275,3 +275,42 @@
               (centered-window-mode)
               ;; Disable line numbers (optional)
               (display-line-numbers-mode -1))))
+
+
+
+;; Deluge BitTorrent client configuration
+(after! deluge
+  ;; Set the deluge daemon connection details
+  ;; Default connection to localhost
+  (setq deluge-host "127.0.0.1"
+        deluge-port 58846
+        deluge-username ""  ; Leave empty for default
+        deluge-password "") ; Leave empty for default
+
+  ;; Optional: Set download directory
+  ;; (setq deluge-download-dir "~/Downloads/")
+
+  ;; Key bindings for deluge
+  (map! :map deluge-mode-map
+        :n "a" #'deluge-add-torrent
+        :n "d" #'deluge-remove-torrent
+        :n "p" #'deluge-pause-torrent
+        :n "r" #'deluge-resume-torrent
+        :n "g" #'deluge-refresh
+        :n "RET" #'deluge-torrent-details
+        :n "q" #'quit-window)
+
+  ;; Optional: Auto-refresh deluge view every 30 seconds
+  (setq deluge-auto-refresh-interval 30)
+
+  ;; Optional: Custom face for completed torrents
+  (custom-set-faces
+   '(deluge-completed ((t (:foreground "#8ccf7e")))) ; Use everblush green
+   '(deluge-seeding ((t (:foreground "#67cbe7"))))   ; Use everblush cyan
+   '(deluge-downloading ((t (:foreground "#e5c76b")))) ; Use everblush yellow
+   '(deluge-paused ((t (:foreground "#b3b9b8"))))))  ; Use everblush white
+
+;; Optional: Global key binding to open deluge
+(map! :leader
+      (:prefix ("t" . "toggle")
+       :desc "Deluge" "d" #'deluge))

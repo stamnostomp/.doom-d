@@ -65,3 +65,5 @@
 (package! flycheck-elm)
 (package! dirvish)
 (package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
+
+(package! deluge)
