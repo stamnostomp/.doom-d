@@ -66,5 +66,4 @@
 (package! dirvish)
 (package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
 
-(package! deluge :recipe
-  (:host github :repo "skangas/deluge"))
+(package! transmission)
