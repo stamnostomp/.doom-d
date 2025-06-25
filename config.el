@@ -313,3 +313,16 @@
 (map! :leader
       (:prefix ("t" . "toggle")
        :desc "Transmission" "t" #'transmission))
+
+
+(use-package! gdscript-mode
+  :hook (gdscript-mode . lsp-deferred))
+
+
+(after! lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(gdscript-mode . "gdscript"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-tcp-connection (lambda (port) `("localhost" ,port)))
+                    :major-modes '(gdscript-mode)
+                    :remote? nil
+                    :server-id 'gdscript)))
