@@ -68,3 +68,6 @@
 
 (package! transmission)
 (package! gdscript-mode)
+
+(package! claude-code
+  :recipe (:host github :repo "stevemolitor/claude-code.el"))
