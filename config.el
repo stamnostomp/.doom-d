@@ -326,3 +326,43 @@
                     :major-modes '(gdscript-mode)
                     :remote? nil
                     :server-id 'gdscript)))
+
+(use-package! claude-code
+  :commands (claude-code claude-code-start-in-directory)
+  :init
+  ;; Set vterm as the terminal backend instead of eat
+  (setq claude-code-terminal-backend 'vterm)
+
+  ;; Your keybindings
+  (map! :leader
+        (:prefix ("c c" . "claude-code")
+         :desc "Start Claude Code" "c" #'claude-code
+         :desc "Start in directory" "d" #'claude-code-start-in-directory
+         :desc "Send command" "s" #'claude-code-send-command
+         :desc "Send with context" "x" #'claude-code-send-command-with-context
+         :desc "Send region" "r" #'claude-code-send-region
+         :desc "Send buffer file" "o" #'claude-code-send-buffer-file
+         :desc "Fix error at point" "e" #'claude-code-fix-error-at-point
+         :desc "Kill Claude" "k" #'claude-code-kill))
+
+  :config
+  ;; Vterm-specific optimizations
+  (setq vterm-max-scrollback 100000)  ; Increase scrollback for long conversations
+  (setq vterm-min-window-width 40)    ; Allow narrow windows
+
+  ;; Optional: Only set increased scrollback for Claude buffers
+  (add-hook 'claude-code-start-hook
+            (lambda ()
+              (when (eq claude-code-terminal-backend 'vterm)
+                (setq-local vterm-max-scrollback 100000))))
+
+  ;; Optional: Configure newline behavior
+  (setq claude-code-newline-style 'newline-on-shift-return))
+
+(with-eval-after-load 'vterm
+  ;; Enable buffering to prevent flickering (default is t)
+  (setq claude-code-vterm-buffer-multi-line-input t)
+
+  ;; Keep default vterm-timer-delay (0.1) for good performance with Claude
+  ;; Don't set this to nil as it can degrade performance with large outputs
+  )
