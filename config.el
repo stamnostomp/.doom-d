@@ -333,19 +333,7 @@
   ;; Set vterm as the terminal backend instead of eat
   (setq claude-code-terminal-backend 'vterm)
 
-  ;; Your keybindings
-  (map! :leader
-        (:prefix ("c c" . "claude-code")
-         :desc "Start Claude Code" "c" #'claude-code
-         :desc "Start in directory" "d" #'claude-code-start-in-directory
-         :desc "Send command" "s" #'claude-code-send-command
-         :desc "Send with context" "x" #'claude-code-send-command-with-context
-         :desc "Send region" "r" #'claude-code-send-region
-         :desc "Send buffer file" "o" #'claude-code-send-buffer-file
-         :desc "Fix error at point" "e" #'claude-code-fix-error-at-point
-         :desc "Kill Claude" "k" #'claude-code-kill))
-
-  :config
+    :config
   ;; Vterm-specific optimizations
   (setq vterm-max-scrollback 100000)  ; Increase scrollback for long conversations
   (setq vterm-min-window-width 40)    ; Allow narrow windows
