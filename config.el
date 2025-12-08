@@ -335,7 +335,7 @@
 
   ;; Your keybindings
   (map! :leader
-        (:prefix ("c c" . "claude-code")
+        (:prefix ("C" . "claude-code")
          :desc "Start Claude Code" "c" #'claude-code
          :desc "Start in directory" "d" #'claude-code-start-in-directory
          :desc "Send command" "s" #'claude-code-send-command
