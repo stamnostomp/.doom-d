@@ -333,6 +333,7 @@
   ;; Set vterm as the terminal backend instead of eat
   (setq claude-code-terminal-backend 'vterm)
 
+<<<<<<< HEAD
   ;; Your keybindings
   (map! :leader
         (:prefix ("C" . "claude-code")
@@ -346,6 +347,9 @@
          :desc "Kill Claude" "k" #'claude-code-kill))
 
   :config
+=======
+    :config
+>>>>>>> 5f2a25fc942cabd7e57682841ff70533af9e5de6
   ;; Vterm-specific optimizations
   (setq vterm-max-scrollback 100000)  ; Increase scrollback for long conversations
   (setq vterm-min-window-width 40)    ; Allow narrow windows
