@@ -327,23 +327,8 @@
                     :remote? nil
                     :server-id 'gdscript)))
 
-  ;; Vterm-specific optimizations
-  (setq vterm-max-scrollback 100000)  ; Increase scrollback for long conversations
-  (setq vterm-min-window-width 40)    ; Allow narrow windows
+;; Vterm-specific optimizations
+(setq vterm-max-scrollback 100000)  ; Increase scrollback for long conversations
+(setq vterm-min-window-width 40)    ; Allow narrow windows
 
-  ;; Optional: Only set increased scrollback for Claude buffers
-  (add-hook 'claude-code-start-hook
-            (lambda ()
-              (when (eq claude-code-terminal-backend 'vterm)
-                (setq-local vterm-max-scrollback 100000))))
-
-  ;; Optional: Configure newline behavior
-  (setq claude-code-newline-style 'newline-on-shift-return))
-
-(with-eval-after-load 'vterm
-  ;; Enable buffering to prevent flickering (default is t)
-  (setq claude-code-vterm-buffer-multi-line-input t)
-
-  ;; Keep default vterm-timer-delay (0.1) for good performance with Claude
-  ;; Don't set this to nil as it can degrade performance with large outputs
-  )
+;; Optional: Only set increased scrollback for Claude buffers
