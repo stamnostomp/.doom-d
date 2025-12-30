@@ -82,9 +82,11 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-;; haskell lint on save
+;; haskell format on save with stylish-haskell
 (after! haskell-mode
-  ;; Enable haskell-stylish-on-save
+  ;; Set path to stylish-haskell executable
+  (setq haskell-stylish-path (executable-find "stylish-haskell"))
+  ;; Enable stylish-haskell on save
   (setq haskell-stylish-on-save t))
 
 ;; Configure LSP for Haskell linting
