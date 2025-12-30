@@ -85,18 +85,32 @@
 ;; haskell lint on save
 (after! haskell-mode
   ;; Enable haskell-stylish-on-save
-  (setq haskell-stylish-on-save t)
+  (setq haskell-stylish-on-save t))
 
-  ;; Enable flycheck for automatic linting
+;; Configure LSP for Haskell linting
+(after! lsp-haskell
+  ;; Enable LSP diagnostics (linting)
+  (setq lsp-diagnostics-provider :auto)
+
+  ;; Show diagnostics on save
+  (setq lsp-modeline-diagnostics-enable t)
+
+  ;; Auto-check on save
+  (add-hook 'haskell-mode-hook
+            (lambda ()
+              (setq-local lsp-diagnostics-provider :flycheck)
+              (flycheck-mode 1))))
+
+;; Flycheck configuration for Haskell
+(after! flycheck
   (add-hook 'haskell-mode-hook #'flycheck-mode)
 
-  ;; Setup flycheck-haskell
-  (with-eval-after-load 'flycheck
-    (require 'flycheck-haskell)
-    (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
+  ;; Load flycheck-haskell for better integration
+  (eval-after-load 'flycheck
+    '(add-hook 'flycheck-mode-hook #'flycheck-haskell-setup))
 
-  ;; Automatically check on save
-  (setq flycheck-check-syntax-automatically '(save mode-enabled)))
+  ;; Check on save
+  (setq flycheck-check-syntax-automatically '(save mode-enabled new-line)))
 (dirvish-override-dired-mode)
 ;;org movement
 (after! org
