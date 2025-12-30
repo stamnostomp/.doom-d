@@ -83,9 +83,20 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 ;; haskell lint on save
+(after! haskell-mode
+  ;; Enable haskell-stylish-on-save
+  (setq haskell-stylish-on-save t)
 
+  ;; Enable flycheck for automatic linting
+  (add-hook 'haskell-mode-hook #'flycheck-mode)
 
-(setq haskell-stylish-on-save t)
+  ;; Setup flycheck-haskell
+  (with-eval-after-load 'flycheck
+    (require 'flycheck-haskell)
+    (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
+
+  ;; Automatically check on save
+  (setq flycheck-check-syntax-automatically '(save mode-enabled)))
 (dirvish-override-dired-mode)
 ;;org movement
 (after! org

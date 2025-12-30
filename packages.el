@@ -52,6 +52,7 @@
 (package! drag-stuff)
 (package! haskell-mode)
 (package! lsp-haskell)
+(package! flycheck-haskell)
 (package! doom-everblush-theme :recipe
   (:host github
    :repo "Everblush/doomemacs"
