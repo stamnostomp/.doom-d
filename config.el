@@ -86,8 +86,11 @@
 (after! haskell-mode
   ;; Set path to stylish-haskell executable
   (setq haskell-stylish-path (executable-find "stylish-haskell"))
-  ;; Enable stylish-haskell on save
-  (setq haskell-stylish-on-save t))
+
+  ;; Add hook to format on save
+  (add-hook 'haskell-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook 'haskell-mode-stylish-buffer nil t))))
 
 ;; Configure LSP for Haskell linting
 (after! lsp-haskell
