@@ -1,6 +1,3 @@
-
-;; Optional: Only set increased scrollback for Claude buffers
-
 ;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -86,32 +83,22 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; FIXED: Haskell format on save with stylish-haskell
+;; FIXED: Haskell format on save with stylish-haskell using reformatter
 (after! haskell-mode
   ;; Set path to stylish-haskell executable
   (setq haskell-stylish-path (executable-find "stylish-haskell"))
 
-  ;; Custom function that formats buffer and properly refreshes display
-  (defun my/format-haskell-buffer ()
-    "Format Haskell buffer with stylish-haskell."
-    (interactive)
-    (when (and (eq major-mode 'haskell-mode)
-               (executable-find "stylish-haskell"))
-      (let ((point (point)))
-        (shell-command-on-region
-         (point-min)
-         (point-max)
-         "stylish-haskell"
-         (current-buffer)
-         t
-         "*stylish-haskell-errors*"
-         t)
-        (goto-char point))))
+  ;; Use reformatter package (should be available in Doom)
+  (use-package! reformatter
+    :config
+    (reformatter-define stylish-haskell
+      :program "stylish-haskell"
+      :lighter " Stylish"))
 
-  ;; Add hook to format on save
+  ;; Enable format on save
   (add-hook 'haskell-mode-hook
             (lambda ()
-              (add-hook 'before-save-hook #'my/format-haskell-buffer nil t))))
+              (stylish-haskell-on-save-mode))))
 
 ;; Configure LSP for Haskell linting
 (after! lsp-haskell
