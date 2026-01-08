@@ -84,47 +84,19 @@
 ;; they are implemented.
 
 ;; FIXED: Haskell format on save with stylish-haskell
-;; Using the exact path found in NixOS
+;; Configure format-all to use stylish-haskell (works with Doom's format +onsave module)
+(after! format-all
+  ;; Add NixOS profile bin to exec-path so format-all can find stylish-haskell
+  (add-to-list 'exec-path "/etc/profiles/per-user/stamno/bin")
+
+  ;; Set the executable path for format-all to find stylish-haskell
+  (setq format-all-formatters
+        '(("Haskell" stylish-haskell))))
+
+;; Alternative: Set haskell-mode to use stylish-haskell
 (after! haskell-mode
-  ;; Set path to stylish-haskell executable
   (setq haskell-stylish-path "/etc/profiles/per-user/stamno/bin/stylish-haskell")
-
-  (defun my/format-haskell-buffer ()
-    "Format Haskell buffer with stylish-haskell."
-    (interactive)
-    (when (eq major-mode 'haskell-mode)
-      (let ((output-buffer (get-buffer-create "*stylish-haskell-output*"))
-            (error-buffer (get-buffer-create "*stylish-haskell-errors*"))
-            (original-point (point))
-            (original-content (buffer-string)))
-        (with-current-buffer output-buffer (erase-buffer))
-        (with-current-buffer error-buffer (erase-buffer))
-        (let ((exit-code (call-process-region
-                          (point-min)
-                          (point-max)
-                          "/etc/profiles/per-user/stamno/bin/stylish-haskell"
-                          nil
-                          (list output-buffer error-buffer)
-                          nil)))
-          (if (zerop exit-code)
-              (progn
-                ;; Replace buffer contents with formatted output
-                (delete-region (point-min) (point-max))
-                (insert (with-current-buffer output-buffer (buffer-string)))
-                (goto-char original-point)
-                (message "Buffer formatted with stylish-haskell"))
-            ;; Show error
-            (progn
-              (message "stylish-haskell failed with exit code %s" exit-code)
-              (with-current-buffer error-buffer
-                (when (> (buffer-size) 0)
-                  (display-buffer error-buffer)))))))))
-
-  ;; Add hook to format on save
-  (add-hook 'haskell-mode-hook
-            (lambda ()
-              (add-hook 'before-save-hook #'my/format-haskell-buffer nil t))))
-(setq haskell-stylish-on-save t)
+  (setq haskell-stylish-on-save t))
 
 ;; Configure LSP for Haskell linting
 (after! lsp-haskell
