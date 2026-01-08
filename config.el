@@ -83,17 +83,17 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; Haskell formatting with stylish-haskell
+;; Haskell formatting with ormolu (most reliable Haskell formatter)
 ;; Add NixOS profile bin to exec-path so formatters can be found
 (add-to-list 'exec-path "/etc/profiles/per-user/stamno/bin")
 
-;; CRITICAL: Enable LSP formatting in Doom (this was missing!)
+;; CRITICAL: Enable LSP formatting in Doom
 (setq +format-with-lsp t)
 
-;; Configure LSP to use stylish-haskell for formatting
+;; Configure LSP to use ormolu for formatting
 (after! lsp-haskell
-  ;; Set stylish-haskell as the formatter
-  (setq lsp-haskell-formatting-provider "stylish-haskell")
+  ;; Set ormolu as the formatter (default and most stable)
+  (setq lsp-haskell-formatting-provider "ormolu")
 
   ;; Enable LSP diagnostics (linting)
   (setq lsp-diagnostics-provider :auto)
@@ -107,12 +107,21 @@
               (setq-local lsp-diagnostics-provider :flycheck)
               (flycheck-mode 1))))
 
-;; Fallback: Direct formatting with stylish-haskell using format-all
-;; (in case LSP formatting has issues)
+;; Fallback: Direct formatting with ormolu using format-all
+;; (in case LSP formatting has issues - known Doom bug)
 (after! format-all
-  (set-formatter! 'stylish-haskell
-    '("stylish-haskell")
+  (set-formatter! 'ormolu
+    '("ormolu")
     :modes '(haskell-mode)))
+
+;; Debug: Add messages to see if formatting is being called
+(defun my/debug-format-hook ()
+  "Debug hook to see if format is being called."
+  (message "Format hook triggered! LSP mode: %s, +format-with-lsp: %s"
+           (bound-and-true-p lsp-mode)
+           +format-with-lsp))
+
+(add-hook 'before-save-hook #'my/debug-format-hook)
 
 ;; Flycheck configuration for Haskell
 (after! flycheck
