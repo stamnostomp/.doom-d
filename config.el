@@ -107,21 +107,15 @@
               (setq-local lsp-diagnostics-provider :flycheck)
               (flycheck-mode 1))))
 
-;; Fallback: Direct formatting with ormolu using format-all
-;; (in case LSP formatting has issues - known Doom bug)
-(after! format-all
-  (set-formatter! 'ormolu
-    '("ormolu")
-    :modes '(haskell-mode)))
+;; WORKAROUND: Doom's format-on-save doesn't trigger LSP formatting properly
+;; So we call lsp-format-buffer directly on save for Haskell files
+(defun my/haskell-format-on-save ()
+  "Format Haskell buffer with LSP before saving."
+  (when (and (eq major-mode 'haskell-mode)
+             (bound-and-true-p lsp-mode))
+    (lsp-format-buffer)))
 
-;; Debug: Add messages to see if formatting is being called
-(defun my/debug-format-hook ()
-  "Debug hook to see if format is being called."
-  (message "Format hook triggered! LSP mode: %s, +format-with-lsp: %s"
-           (bound-and-true-p lsp-mode)
-           +format-with-lsp))
-
-(add-hook 'before-save-hook #'my/debug-format-hook)
+(add-hook 'before-save-hook #'my/haskell-format-on-save)
 
 ;; Flycheck configuration for Haskell
 (after! flycheck
