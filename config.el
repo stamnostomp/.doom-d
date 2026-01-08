@@ -124,6 +124,7 @@
   (add-hook 'haskell-mode-hook
             (lambda ()
               (add-hook 'before-save-hook #'my/format-haskell-buffer nil t))))
+(setq haskell-stylish-on-save t)
 
 ;; Configure LSP for Haskell linting
 (after! lsp-haskell
