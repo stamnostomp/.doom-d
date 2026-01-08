@@ -83,23 +83,15 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; FIXED: Haskell format on save with stylish-haskell
-;; Configure format-all to use stylish-haskell (works with Doom's format +onsave module)
-(after! format-all
-  ;; Add NixOS profile bin to exec-path so format-all can find stylish-haskell
-  (add-to-list 'exec-path "/etc/profiles/per-user/stamno/bin")
+;; Haskell formatting with stylish-haskell via LSP
+;; Add NixOS profile bin to exec-path so LSP can find stylish-haskell
+(add-to-list 'exec-path "/etc/profiles/per-user/stamno/bin")
 
-  ;; Set the executable path for format-all to find stylish-haskell
-  (setq format-all-formatters
-        '(("Haskell" stylish-haskell))))
-
-;; Alternative: Set haskell-mode to use stylish-haskell
-(after! haskell-mode
-  (setq haskell-stylish-path "/etc/profiles/per-user/stamno/bin/stylish-haskell")
-  (setq haskell-stylish-on-save t))
-
-;; Configure LSP for Haskell linting
+;; Configure LSP to use stylish-haskell for formatting
 (after! lsp-haskell
+  ;; Set stylish-haskell as the formatter
+  (setq lsp-haskell-formatting-provider "stylish-haskell")
+
   ;; Enable LSP diagnostics (linting)
   (setq lsp-diagnostics-provider :auto)
 
