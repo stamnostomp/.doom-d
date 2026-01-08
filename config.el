@@ -83,9 +83,12 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; Haskell formatting with stylish-haskell via LSP
-;; Add NixOS profile bin to exec-path so LSP can find stylish-haskell
+;; Haskell formatting with stylish-haskell
+;; Add NixOS profile bin to exec-path so formatters can be found
 (add-to-list 'exec-path "/etc/profiles/per-user/stamno/bin")
+
+;; CRITICAL: Enable LSP formatting in Doom (this was missing!)
+(setq +format-with-lsp t)
 
 ;; Configure LSP to use stylish-haskell for formatting
 (after! lsp-haskell
@@ -103,6 +106,13 @@
             (lambda ()
               (setq-local lsp-diagnostics-provider :flycheck)
               (flycheck-mode 1))))
+
+;; Fallback: Direct formatting with stylish-haskell using format-all
+;; (in case LSP formatting has issues)
+(after! format-all
+  (set-formatter! 'stylish-haskell
+    '("stylish-haskell")
+    :modes '(haskell-mode)))
 
 ;; Flycheck configuration for Haskell
 (after! flycheck
