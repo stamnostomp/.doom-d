@@ -288,6 +288,19 @@
 ;; Emacs Everywhere configuration
 (use-package! emacs-everywhere
   :config
+  ;; Wayland/Hyprland support - use hyprctl to get active window info
+  (setq emacs-everywhere-app-info-function
+        (lambda ()
+          (let* ((json (shell-command-to-string "hyprctl activewindow -j"))
+                 (data (ignore-errors (json-parse-string json :object-type 'alist))))
+            (if data
+                (emacs-everywhere-app
+                 :id (or (alist-get 'pid data) 0)
+                 :class (or (alist-get 'class data) "")
+                 :title (or (alist-get 'title data) ""))
+              ;; Fallback if hyprctl fails
+              (emacs-everywhere-app :id 0 :class "" :title "")))))
+
   ;; Set a different keybinding for the global shortcut
   ;; (This is system-level and may require additional setup in your DE/WM)
   (setq emacs-everywhere-key "Super-semicolon")  ; Super+;
