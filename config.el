@@ -336,7 +336,12 @@
               ;; Center content
               (centered-window-mode)
               ;; Disable line numbers (optional)
-              (display-line-numbers-mode -1))))
+              (display-line-numbers-mode -1)))
+
+  ;; Keybindings for emacs-everywhere
+  (map! :map emacs-everywhere-mode-map
+        "C-c C-c" #'emacs-everywhere-finish
+        "C-c C-k" #'emacs-everywhere-abort))
 
 
 ;; Transmission BitTorrent client configuration
