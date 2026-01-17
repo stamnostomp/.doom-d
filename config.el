@@ -301,6 +301,10 @@
               ;; Fallback if hyprctl fails
               (emacs-everywhere-app :id 0 :class "" :title "")))))
 
+  ;; Wayland clipboard and paste support
+  (setq emacs-everywhere-copy-command '("wl-copy"))
+  (setq emacs-everywhere-paste-command '("wtype" "-M" "ctrl" "v" "-m" "ctrl"))
+
   ;; Set a different keybinding for the global shortcut
   ;; (This is system-level and may require additional setup in your DE/WM)
   (setq emacs-everywhere-key "Super-semicolon")  ; Super+;
