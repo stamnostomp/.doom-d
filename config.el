@@ -296,31 +296,36 @@
           (width . 80)
           (height . 24)))
 
+  ;; Store the window address for later refocus
+  (defvar my/emacs-everywhere-window-address nil)
+
   ;; Wayland/Hyprland - get window info via hyprctl
   (setq emacs-everywhere-app-info-function
         (lambda ()
           (let* ((json (shell-command-to-string "hyprctl activewindow -j"))
-                 (data (ignore-errors (json-parse-string json :object-type 'alist)))
-                 (window-id (if data (alist-get 'address data) "0"))
-                 (window-class (if data (or (alist-get 'class data) "") ""))
-                 (window-title (if data (or (alist-get 'title data) "") "")))
+                 (data (ignore-errors (json-parse-string json :object-type 'alist))))
+            (setq my/emacs-everywhere-window-address
+                  (if data (alist-get 'address data) nil))
             (make-emacs-everywhere-app
-             :id window-id
-             :class window-class
-             :title window-title))))
+             :id (if data (or (alist-get 'pid data) 0) 0)
+             :class (if data (or (alist-get 'class data) "") "")
+             :title (if data (or (alist-get 'title data) "") "")))))
 
   ;; Wayland clipboard
   (setq emacs-everywhere-copy-command '("wl-copy"))
   (setq emacs-everywhere-paste-command '("sh" "-c" "wl-paste -n | wtype -"))
 
-  ;; Refocus original window using hyprctl
-  (setq emacs-everywhere-window-focus-command
-        (lambda (app)
-          (let ((id (emacs-everywhere-app-id app)))
-            (when id
-              (call-process "hyprctl" nil nil nil
-                            "dispatch" "focuswindow"
-                            (format "address:%s" id))))))
+  ;; Disable built-in window focus (we'll handle it ourselves)
+  (setq emacs-everywhere-window-focus-command nil)
+
+  ;; Refocus and paste after finish
+  (defun my/emacs-everywhere-refocus ()
+    (when my/emacs-everywhere-window-address
+      (call-process "hyprctl" nil nil nil
+                    "dispatch" "focuswindow"
+                    (format "address:%s" my/emacs-everywhere-window-address))))
+
+  (advice-add 'emacs-everywhere--finish :after #'my/emacs-everywhere-refocus)
 
   ;; Default to org-mode
   (setq emacs-everywhere-major-mode-function #'org-mode)
