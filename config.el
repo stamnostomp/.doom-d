@@ -342,12 +342,16 @@
   ;; Use markdown-mode instead of org-mode to avoid C-c C-c conflicts
   (setq emacs-everywhere-major-mode-function #'markdown-mode)
 
-  ;; Keybindings - Ctrl+Return to finish, Escape to abort
-  (add-hook 'emacs-everywhere-init-hooks
-            (lambda ()
-              (local-set-key [C-return] #'my/emacs-everywhere-finish)
-              (local-set-key (kbd "C-j") #'my/emacs-everywhere-finish)
-              (local-set-key (kbd "<escape>") #'emacs-everywhere-abort))))
+  ;; Create a minor mode with high-priority keymap
+  (defvar my/ee-keymap (make-sparse-keymap))
+  (define-key my/ee-keymap (kbd "C-;") #'my/emacs-everywhere-finish)
+  (define-key my/ee-keymap (kbd "M-RET") #'my/emacs-everywhere-finish)
+
+  (define-minor-mode my/ee-mode
+    "Minor mode for emacs-everywhere keybindings"
+    :keymap my/ee-keymap)
+
+  (add-hook 'emacs-everywhere-init-hooks #'my/ee-mode))
 
 
 ;; Transmission BitTorrent client configuration
