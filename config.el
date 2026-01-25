@@ -287,9 +287,17 @@
         :n "v" #'dirvish-vc-menu
         :n "y" #'dirvish-yank-menu))
 
-;; Emacs Everywhere configuration
+;; Emacs Everywhere configuration for Wayland/Hyprland
 (use-package! emacs-everywhere
   :config
+  ;; Suppress pure-GTK warning
+  (setq emacs-everywhere-frame-parameters
+        '((name . "emacs-everywhere")
+          (width . 80)
+          (height . 24)
+          (minibuffer . t)
+          (menu-bar-lines . nil)))
+
   ;; Wayland/Hyprland support - use hyprctl to get active window info
   (setq emacs-everywhere-app-info-function
         (lambda ()
@@ -303,24 +311,16 @@
               ;; Fallback if hyprctl fails
               (emacs-everywhere-app :id 0 :class "" :title "")))))
 
-  ;; Wayland clipboard and paste support
+  ;; Wayland clipboard and paste - use wtype to type clipboard content directly
   (setq emacs-everywhere-copy-command '("wl-copy"))
-  (setq emacs-everywhere-paste-command '("wtype" "-M" "ctrl" "v" "-m" "ctrl"))
+  (setq emacs-everywhere-paste-command '("sh" "-c" "sleep 0.1 && wl-paste -n | wtype -s 50 -"))
 
-  ;; Set a different keybinding for the global shortcut
-  ;; (This is system-level and may require additional setup in your DE/WM)
-  (setq emacs-everywhere-key "Super-semicolon")  ; Super+;
-
-  ;; Set frame parameters
-  (setq emacs-everywhere-frame-parameters
-        '((name . "emacs-everywhere")
-          (width . 80)
-          (height . 24)
-          (minibuffer . t)
-          (menu-bar-lines . t)))
+  ;; Window class for Hyprland rules
+  (setq emacs-everywhere-window-focus-command
+        '("hyprctl" "dispatch" "focuswindow" "address:%w"))
 
   ;; Set major mode based on source application
-  (setq emacs-everywhere-major-mode-function #'org-mode)  ; Default to org-mode
+  (setq emacs-everywhere-major-mode-function #'org-mode)
 
   ;; Application-specific major modes
   (setq emacs-everywhere-app-classes
@@ -331,13 +331,8 @@
   ;; Hook that runs before the frame is displayed
   (add-hook 'emacs-everywhere-init-hooks
             (defun my-emacs-everywhere-setup ()
-              ;; Enable spell-checking
               (spell-fu-mode)
-              ;; Enable auto-save
               (auto-save-visited-mode +1)
-              ;; Center content
-              (centered-window-mode)
-              ;; Disable line numbers (optional)
               (display-line-numbers-mode -1)))
 
   ;; Keybindings for emacs-everywhere
