@@ -345,10 +345,11 @@
   ;; Default to org-mode
   (setq emacs-everywhere-major-mode-function #'org-mode)
 
-  ;; Keybindings
-  (map! :map emacs-everywhere-mode-map
-        "C-c C-c" #'my/emacs-everywhere-finish
-        "C-c C-k" #'emacs-everywhere-abort))
+  ;; Keybindings - use hook to ensure mode-map exists
+  (add-hook 'emacs-everywhere-init-hooks
+            (lambda ()
+              (local-set-key (kbd "C-c C-c") #'my/emacs-everywhere-finish)
+              (local-set-key (kbd "C-c C-k") #'emacs-everywhere-abort))))
 
 
 ;; Transmission BitTorrent client configuration
