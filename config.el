@@ -37,7 +37,7 @@
 ;;(setq doom-theme 'doom-earl-grey)
 ;;(setq doom-theme 'doom-everblush)
 ;;(setq doom-theme 'doom-zenburn)
-(setq doom-theme   'doom-gruvbox)
+(setq doom-theme   'doom-gruvbox-light)
 (setq shell-file-name (executable-find "bash"))
 (setq-default vterm-shell (executable-find "fish"))
 (setq-default explicit-shell-file-name (executable-find "fish"))
