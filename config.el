@@ -311,28 +311,43 @@
              :class (if data (or (alist-get 'class data) "") "")
              :title (if data (or (alist-get 'title data) "") "")))))
 
-  ;; Wayland clipboard
+  ;; Wayland clipboard - copy only, we handle paste ourselves
   (setq emacs-everywhere-copy-command '("wl-copy"))
-  (setq emacs-everywhere-paste-command '("sh" "-c" "wl-paste -n | wtype -"))
-
-  ;; Disable built-in window focus (we'll handle it ourselves)
+  (setq emacs-everywhere-paste-command nil)
   (setq emacs-everywhere-window-focus-command nil)
 
-  ;; Refocus and paste after finish
-  (defun my/emacs-everywhere-refocus ()
-    (when my/emacs-everywhere-window-address
-      (call-process "hyprctl" nil nil nil
-                    "dispatch" "focuswindow"
-                    (format "address:%s" my/emacs-everywhere-window-address))))
-
-  (advice-add 'emacs-everywhere--finish :after #'my/emacs-everywhere-refocus)
+  ;; Custom finish: copy, close frame, refocus, paste
+  (defun my/emacs-everywhere-finish ()
+    "Copy buffer, close frame, refocus original window, and paste."
+    (interactive)
+    (let ((text (buffer-string)))
+      ;; Copy to clipboard
+      (let ((proc (make-process
+                   :name "wl-copy"
+                   :command '("wl-copy")
+                   :connection-type 'pipe)))
+        (process-send-string proc text)
+        (process-send-eof proc))
+      ;; Delete the frame
+      (run-at-time 0.1 nil
+                   (lambda ()
+                     (delete-frame)
+                     ;; Refocus original window
+                     (when my/emacs-everywhere-window-address
+                       (call-process "hyprctl" nil nil nil
+                                     "dispatch" "focuswindow"
+                                     (format "address:%s" my/emacs-everywhere-window-address)))
+                     ;; Paste after small delay
+                     (run-at-time 0.15 nil
+                                  (lambda ()
+                                    (call-process-shell-command "wl-paste -n | wtype -" nil 0)))))))
 
   ;; Default to org-mode
   (setq emacs-everywhere-major-mode-function #'org-mode)
 
   ;; Keybindings
   (map! :map emacs-everywhere-mode-map
-        "C-c C-c" #'emacs-everywhere-finish
+        "C-c C-c" #'my/emacs-everywhere-finish
         "C-c C-k" #'emacs-everywhere-abort))
 
 
