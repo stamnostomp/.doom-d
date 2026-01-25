@@ -339,19 +339,21 @@
          (format "sleep 0.3; hyprctl dispatch focuswindow address:%s; sleep 0.2; wl-paste -n | wtype -"
                  window-addr)))))
 
-  ;; Use markdown-mode instead of org-mode to avoid C-c C-c conflicts
-  (setq emacs-everywhere-major-mode-function #'markdown-mode)
+  ;; Use text-mode to avoid keybinding conflicts
+  (setq emacs-everywhere-major-mode-function #'text-mode)
 
-  ;; Create a minor mode with high-priority keymap
-  (defvar my/ee-keymap (make-sparse-keymap))
-  (define-key my/ee-keymap (kbd "C-;") #'my/emacs-everywhere-finish)
-  (define-key my/ee-keymap (kbd "M-RET") #'my/emacs-everywhere-finish)
+  ;; Bind directly to emacs-everywhere-mode-map
+  (map! :after emacs-everywhere
+        :map emacs-everywhere-mode-map
+        "C-c C-c" #'my/emacs-everywhere-finish
+        "C-c C-f" #'my/emacs-everywhere-finish)
 
-  (define-minor-mode my/ee-mode
-    "Minor mode for emacs-everywhere keybindings"
-    :keymap my/ee-keymap)
-
-  (add-hook 'emacs-everywhere-init-hooks #'my/ee-mode))
+  ;; Also try global binding that only works in ee buffers
+  (global-set-key (kbd "C-c C-e")
+                  (lambda ()
+                    (interactive)
+                    (when (bound-and-true-p emacs-everywhere-mode)
+                      (my/emacs-everywhere-finish)))))
 
 
 ;; Transmission BitTorrent client configuration
