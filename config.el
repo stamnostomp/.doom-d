@@ -304,7 +304,7 @@
                  (window-id (if data (alist-get 'address data) "0"))
                  (window-class (if data (or (alist-get 'class data) "") ""))
                  (window-title (if data (or (alist-get 'title data) "") "")))
-            (emacs-everywhere-app
+            (make-emacs-everywhere-app
              :id window-id
              :class window-class
              :title window-title))))
