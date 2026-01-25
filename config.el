@@ -342,14 +342,16 @@
                                   (lambda ()
                                     (call-process-shell-command "wl-paste -n | wtype -" nil 0)))))))
 
-  ;; Default to org-mode
-  (setq emacs-everywhere-major-mode-function #'org-mode)
+  ;; Use markdown-mode instead of org-mode to avoid C-c C-c conflicts
+  (setq emacs-everywhere-major-mode-function #'markdown-mode)
 
-  ;; Keybindings - use hook to ensure mode-map exists
+  ;; Keybindings
   (add-hook 'emacs-everywhere-init-hooks
             (lambda ()
               (local-set-key (kbd "C-c C-c") #'my/emacs-everywhere-finish)
-              (local-set-key (kbd "C-c C-k") #'emacs-everywhere-abort))))
+              (local-set-key (kbd "C-c C-k") #'emacs-everywhere-abort)
+              ;; Also bind to C-c C-s as backup
+              (local-set-key (kbd "C-c C-s") #'my/emacs-everywhere-finish))))
 
 
 ;; Transmission BitTorrent client configuration
