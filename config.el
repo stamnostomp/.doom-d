@@ -22,7 +22,7 @@
 ;; accept. For example:
 ;;
 ;;(setq doom-font "dina-font")
-(setq doom-font "Dina:pixelsize=12:antialias=off")
+(setq doom-font "Dina:pixelsize=14:antialias=off")
 ;;(setq doom-font "Nia Font:pixelsize=15:foundry=CLGR:weight=regular:slant=normal:width=normal:scalable=true")
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
@@ -34,7 +34,8 @@
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
 ;;(setq doom-theme 'doom-gruvbox)
-(setq doom-theme 'doom-everblush)
+(setq doom-theme 'cherry-blossom)
+;;(setq doom-theme 'doom-everblush)
 ;;(setq doom-theme 'doom-zenburn)
 ;;(setq doom-theme   'doom-gruvbox)
 (setq shell-file-name (executable-find "bash"))
