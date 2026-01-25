@@ -290,52 +290,42 @@
 ;; Emacs Everywhere configuration for Wayland/Hyprland
 (use-package! emacs-everywhere
   :config
-  ;; Suppress pure-GTK warning
+  ;; Frame parameters
   (setq emacs-everywhere-frame-parameters
         '((name . "emacs-everywhere")
           (width . 80)
-          (height . 24)
-          (minibuffer . t)
-          (menu-bar-lines . nil)))
+          (height . 24)))
 
-  ;; Wayland/Hyprland support - use hyprctl to get active window info
+  ;; Wayland/Hyprland - get window info via hyprctl
   (setq emacs-everywhere-app-info-function
         (lambda ()
           (let* ((json (shell-command-to-string "hyprctl activewindow -j"))
-                 (data (ignore-errors (json-parse-string json :object-type 'alist))))
-            (if data
-                (emacs-everywhere-app
-                 :id (or (alist-get 'pid data) 0)
-                 :class (or (alist-get 'class data) "")
-                 :title (or (alist-get 'title data) ""))
-              ;; Fallback if hyprctl fails
-              (emacs-everywhere-app :id 0 :class "" :title "")))))
+                 (data (ignore-errors (json-parse-string json :object-type 'alist)))
+                 (window-id (if data (alist-get 'address data) "0"))
+                 (window-class (if data (or (alist-get 'class data) "") ""))
+                 (window-title (if data (or (alist-get 'title data) "") "")))
+            (emacs-everywhere-app
+             :id window-id
+             :class window-class
+             :title window-title))))
 
-  ;; Wayland clipboard and paste - use wtype to type clipboard content directly
+  ;; Wayland clipboard
   (setq emacs-everywhere-copy-command '("wl-copy"))
-  (setq emacs-everywhere-paste-command '("sh" "-c" "sleep 0.1 && wl-paste -n | wtype -s 50 -"))
+  (setq emacs-everywhere-paste-command '("sh" "-c" "wl-paste -n | wtype -"))
 
-  ;; Window class for Hyprland rules
+  ;; Refocus original window using hyprctl
   (setq emacs-everywhere-window-focus-command
-        '("hyprctl" "dispatch" "focuswindow" "address:%w"))
+        (lambda (app)
+          (let ((id (emacs-everywhere-app-id app)))
+            (when id
+              (call-process "hyprctl" nil nil nil
+                            "dispatch" "focuswindow"
+                            (format "address:%s" id))))))
 
-  ;; Set major mode based on source application
+  ;; Default to org-mode
   (setq emacs-everywhere-major-mode-function #'org-mode)
 
-  ;; Application-specific major modes
-  (setq emacs-everywhere-app-classes
-        '(("Firefox" . markdown-mode)
-          ("Discord" . markdown-mode)
-          ("Slack" . markdown-mode)))
-
-  ;; Hook that runs before the frame is displayed
-  (add-hook 'emacs-everywhere-init-hooks
-            (defun my-emacs-everywhere-setup ()
-              (spell-fu-mode)
-              (auto-save-visited-mode +1)
-              (display-line-numbers-mode -1)))
-
-  ;; Keybindings for emacs-everywhere
+  ;; Keybindings
   (map! :map emacs-everywhere-mode-map
         "C-c C-c" #'emacs-everywhere-finish
         "C-c C-k" #'emacs-everywhere-abort))
