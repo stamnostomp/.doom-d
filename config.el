@@ -342,11 +342,12 @@
   ;; Use markdown-mode instead of org-mode to avoid C-c C-c conflicts
   (setq emacs-everywhere-major-mode-function #'markdown-mode)
 
-  ;; Keybindings - Ctrl+Return to finish, C-c C-k to abort
+  ;; Keybindings - Ctrl+Return to finish, Escape to abort
   (add-hook 'emacs-everywhere-init-hooks
             (lambda ()
-              (local-set-key (kbd "C-<return>") #'my/emacs-everywhere-finish)
-              (local-set-key (kbd "C-c C-k") #'emacs-everywhere-abort))))
+              (local-set-key [C-return] #'my/emacs-everywhere-finish)
+              (local-set-key (kbd "C-j") #'my/emacs-everywhere-finish)
+              (local-set-key (kbd "<escape>") #'emacs-everywhere-abort))))
 
 
 ;; Transmission BitTorrent client configuration
