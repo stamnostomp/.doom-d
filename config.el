@@ -320,20 +320,23 @@
   (defun my/emacs-everywhere-finish ()
     "Copy buffer, close frame, refocus original window, and paste."
     (interactive)
-    (let ((text (buffer-string))
-          (window-addr my/emacs-everywhere-window-address))
-      ;; Copy to clipboard synchronously
-      (with-temp-buffer
-        (insert text)
-        (call-process-region (point-min) (point-max) "wl-copy" nil 0))
+    (let* ((window-addr my/emacs-everywhere-window-address)
+           (text (save-excursion
+                   (goto-char (point-min))
+                   ;; Skip title line if present
+                   (when (looking-at "title:")
+                     (forward-line 1))
+                   (string-trim (buffer-substring-no-properties (point) (point-max))))))
+      ;; Save text to file and copy
+      (write-region text nil "/tmp/ee-text" nil 'quiet)
+      (call-process-shell-command "wl-copy < /tmp/ee-text")
       ;; Close frame
       (delete-frame)
-      ;; Refocus and paste via shell script for proper timing
-      (when window-addr
-        (start-process-shell-command
-         "emacs-everywhere-paste" nil
-         (format "sleep 0.2 && hyprctl dispatch focuswindow address:%s && sleep 0.1 && wl-paste -n | wtype -"
-                 window-addr)))))
+      ;; Refocus and paste in background
+      (start-process-shell-command
+       "ee-paste" nil
+       (format "sleep 0.3; hyprctl dispatch focuswindow address:%s; sleep 0.2; wl-paste -n | wtype -"
+               (or window-addr "")))))
 
   ;; Use markdown-mode instead of org-mode to avoid C-c C-c conflicts
   (setq emacs-everywhere-major-mode-function #'markdown-mode)
