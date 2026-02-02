@@ -253,25 +253,16 @@
 
 ;; Dirvish preview configuration
 (after! dirvish
-  ;; Enable preview
+  ;; Enable preview - use correct dispatcher names
   (setq dirvish-preview-dispatchers
-        '(image-preview
-          gif-preview
-          video-preview
-          archive-preview
-          pdf-preview
-          html-preview
-          dir-info
-          info-preview
-          markdown-preview
-          org-preview
-          text-preview))
+        '(image gif video audio epub pdf archive font))
 
   ;; Set preview delay
   (setq dirvish-preview-delay 0.2)
 
   ;; Set preview size (percentage of window)
-  (setq dirvish-preview-size 0.4)
+  ;; Note: dirvish-preview-size doesn't exist, use dirvish-default-layout instead
+  ;; (setq dirvish-default-layout '(1 0.11 0.55))  ; (depth max-parent-width preview-width)
 
   ;; Show image properties in the preview
   (setq dirvish-show-media-properties t)
