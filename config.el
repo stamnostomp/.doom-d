@@ -402,3 +402,35 @@
 (setq vterm-min-window-width 40)    ; Allow narrow windows
 
 ;; Optional: Only set increased scrollback for Claude buffers
+
+;; empv - mpv-based media player
+(use-package! empv
+  :config
+  ;; Save position on quit so you can resume playback
+  (add-to-list 'empv-mpv-args "--save-position-on-quit")
+
+  ;; Example radio channels (customize as needed)
+  (setq empv-radio-channels
+        '(("SomaFM - Groove Salad" . "http://www.somafm.com/groovesalad.pls")
+          ("SomaFM - Drone Zone" . "http://www.somafm.com/dronezone.pls")
+          ("SomaFM - Deep Space One" . "http://www.somafm.com/deepspaceone.pls")))
+
+  ;; Keybindings under SPC m prefix
+  (map! :leader
+        (:prefix ("m" . "media")
+         :desc "Play/pause" "SPC" #'empv-toggle
+         :desc "Play file" "f" #'empv-play-file
+         :desc "Play directory" "d" #'empv-play-directory
+         :desc "Play radio" "r" #'empv-play-radio
+         :desc "Play URL" "u" #'empv-play-url
+         :desc "YouTube search" "y" #'empv-youtube
+         :desc "Playlist" "p" #'empv-playlist-select
+         :desc "Next" "n" #'empv-playlist-next
+         :desc "Previous" "N" #'empv-playlist-prev
+         :desc "Shuffle" "s" #'empv-playlist-shuffle
+         :desc "Volume up" "+" #'empv-volume-up
+         :desc "Volume down" "-" #'empv-volume-down
+         :desc "Seek forward" "l" #'empv-seek-forward
+         :desc "Seek backward" "h" #'empv-seek-backward
+         :desc "Current info" "i" #'empv-current-info
+         :desc "Quit" "q" #'empv-quit)))
