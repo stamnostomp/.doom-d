@@ -403,6 +403,22 @@
 
 ;; Optional: Only set increased scrollback for Claude buffers
 
+;; TidalCycles live coding
+(after! tidal
+  (setq tidal-interpreter "tidal-ghci")
+  (setq tidal-interpreter-arguments nil)
+  (map! :map tidal-mode-map
+        :localleader
+        "e" #'tidal-run-line
+        "E" #'tidal-run-multiple-lines
+        "h" #'tidal-hush
+        "s" #'tidal-start-tidal
+        "q" #'tidal-quit-tidal))
+
+(setq tidal-boot-script-path
+      (string-trim
+       (shell-command-to-string
+        "nix eval --raw nixpkgs#haskellPackages.tidal 2>/dev/null | xargs -I{} find {} -name 'BootTidal.hs' | head -1")))
 ;; empv - mpv-based media player
 (use-package! empv
   :config

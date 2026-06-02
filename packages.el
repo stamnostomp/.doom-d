@@ -75,3 +75,4 @@
 (package! eat)
 
 (package! empv)
+(package! tidal)
