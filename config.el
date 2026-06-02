@@ -407,7 +407,7 @@
 (after! tidal
   (setq tidal-interpreter "tidal-ghci")
   (setq tidal-interpreter-arguments nil)
-  (setq didal-boot-script-path "/nix/store/x4n72bc4h4r4d5rjl2lmnbdayjdg6p5y-zfxifyyfj02lxz7jmknaqlr3w6baydrn-source/BootTidal.hs")
+  (setq tidal-boot-script-path "/nix/store/x4n72bc4h4r4d5rjl2lmnbdayjdg6p5y-zfxifyyfj02lxz7jmknaqlr3w6baydrn-source/BootTidal.hs")
   (map! :map tidal-mode-map
         :localleader
         "e" #'tidal-run-line
