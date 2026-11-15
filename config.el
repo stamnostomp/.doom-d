@@ -35,9 +35,9 @@
 ;; `load-theme' function. This is the default:
 ;;(setq doom-theme 'doom-gruvbox)
 ;;(setq doom-theme 'doom-earl-grey)
-;;(setq doom-theme 'doom-everblush)
+(setq doom-theme 'doom-everblush)
 ;;(setq doom-theme 'doom-zenburn)
-(setq doom-theme 'doom-sourcerer)
+;;(setq doom-theme 'doom-sourcerer)
 ;;(setq doom-theme   'doom-gruvbox-light)
 (setq shell-file-name (executable-find "bash"))
 (setq-default vterm-shell (executable-find "fish"))
@@ -45,6 +45,53 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
+
+;; ── Frame transparency ──────────────────────────────────────────────
+;; `alpha-background' (Emacs 29+) makes only the background translucent,
+;; keeping text and UI fully opaque. 100 = opaque, lower = more transparent.
+;; If you'd rather have text translucent too, use the old-style frame
+;; parameter instead: (add-to-list 'default-frame-alist '(alpha . 90))
+(defvar my/frame-transparency 90
+  "Background opacity percentage for Emacs frames (100 = opaque).")
+
+(defun my/apply-frame-transparency ()
+  "Apply `my/frame-transparency' to all frames and future frames."
+  (setf (alist-get 'alpha-background default-frame-alist)
+        my/frame-transparency)
+  (dolist (frame (frame-list))
+    (set-frame-parameter frame 'alpha-background my/frame-transparency)))
+
+(defun my/toggle-transparency ()
+  "Toggle background transparency of the selected frame."
+  (interactive)
+  (if (< (or (frame-parameter nil 'alpha-background) 100) 100)
+      (set-frame-parameter nil 'alpha-background 100)
+    (my/apply-frame-transparency)))
+
+(defun my/transparency-adjust (amount)
+  "Adjust frame transparency by AMOUNT percent (negative = more transparent)."
+  (interactive "p")
+  (setq my/frame-transparency
+        (min 100 (max 20 (+ my/frame-transparency amount))))
+  (my/apply-frame-transparency))
+
+(defun my/transparency-decrease (&optional _arg)
+  "Make frames more transparent by 5%."
+  (interactive)
+  (my/transparency-adjust -5))
+
+(defun my/transparency-increase (&optional _arg)
+  "Make frames less transparent by 5%."
+  (interactive)
+  (my/transparency-adjust 5))
+
+(my/apply-frame-transparency)  ; apply on startup
+
+(map! :leader
+      (:prefix ("t" . "toggle")
+       :desc "Toggle transparency" "o" #'my/toggle-transparency
+       :desc "Less transparent"    "+" #'my/transparency-increase
+       :desc "More transparent"    "-" #'my/transparency-decrease))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -156,6 +203,12 @@
    (make-lsp-client :new-connection (lsp-stdio-connection "vscode-html-language-server")
                     :major-modes '(html-mode)
                     :server-id 'html)))
+
+(setq treesit-language-source-alist
+      '((c3 "https://github.com/c3lang/tree-sitter-c3")))
+
+(add-to-list 'auto-mode-alist
+             '("\\.c3\\'" . c3-ts-mode))
 
 ;; Company configuration for better completion
 (after! company
@@ -402,7 +455,16 @@
 (setq vterm-min-window-width 40)    ; Allow narrow windows
 
 ;; Optional: Only set increased scrollback for Claude buffers
-
+(with-eval-after-load 'org
+  (require 'edraw-org)
+  (edraw-org-setup-default))
+;; When using the org-export-in-background option (when using the
+;; asynchronous export function), the following settings are
+;; required. This is because Emacs started in a separate process does
+;; not load org.el but only ox.el.
+(with-eval-after-load "ox"
+  (require 'edraw-org)
+  (edraw-org-setup-exporter))
 ;; TidalCycles live coding
 (after! tidal
   (setq tidal-interpreter "tidal-ghci")
@@ -415,7 +477,8 @@
         "h" #'tidal-hush
         "s" #'tidal-start-tidal
         "q" #'tidal-quit-tidal))
-
+(use-package! org-draw
+  :commands (org-draw org-draw-edit org-draw-setup))
 ;; empv - mpv-based media player
 (use-package! empv
   :config

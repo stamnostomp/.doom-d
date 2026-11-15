@@ -57,7 +57,15 @@
   (:host github
    :repo "Everblush/doomemacs"
    :files ("*.el")))
-
+(package! edraw-org :recipe
+  (:host github
+   :repo "misohena/el-easydraw"
+   :files ("*.el")))
+(package! odin-mode :recipe
+  (:host github
+   :repo "mattt-b/odin-mode"
+   ))
+(package! org-draw)
 (package! clang-format)
 (package! nixfmt)
 (package! elm-mode)
@@ -76,3 +84,5 @@
 
 (package! empv)
 (package! tidal)
+(package! gnuplot)
+(package! nov)
