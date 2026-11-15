@@ -86,3 +86,8 @@
 (package! tidal)
 (package! gnuplot)
 (package! nov)
+
+;; AI agents in Emacs via ACP (Agent Client Protocol) — OpenCode etc.
+(package! shell-maker)
+(package! acp)
+(package! agent-shell)

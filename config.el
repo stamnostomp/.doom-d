@@ -47,26 +47,37 @@
 (setq display-line-numbers-type 'relative)
 
 ;; ── Frame transparency ──────────────────────────────────────────────
-;; `alpha-background' (Emacs 29+) makes only the background translucent,
-;; keeping text and UI fully opaque. 100 = opaque, lower = more transparent.
-;; If you'd rather have text translucent too, use the old-style frame
-;; parameter instead: (add-to-list 'default-frame-alist '(alpha . 90))
+;; pgtk/NS builds support `alpha-background' (Emacs 29+), which makes only
+;; the background translucent. X11 builds don't implement it, so we fall
+;; back to the legacy `alpha' parameter, which affects the whole frame
+;; (text included) and requires a compositor (Hyprland provides one).
 (defvar my/frame-transparency 90
-  "Background opacity percentage for Emacs frames (100 = opaque).")
+  "Opacity percentage for Emacs frames (100 = opaque).")
+
+(defun my/frame-alpha-parameter ()
+  "Return the frame parameter used for transparency on this build."
+  (if (or (featurep 'pgtk) (featurep 'ns))
+      'alpha-background 'alpha))
 
 (defun my/apply-frame-transparency ()
   "Apply `my/frame-transparency' to all frames and future frames."
-  (setf (alist-get 'alpha-background default-frame-alist)
-        my/frame-transparency)
-  (dolist (frame (frame-list))
-    (set-frame-parameter frame 'alpha-background my/frame-transparency)))
+  (let* ((param (my/frame-alpha-parameter))
+         (value (if (eq param 'alpha)
+                    (cons my/frame-transparency my/frame-transparency)
+                  my/frame-transparency)))
+    (setf (alist-get param default-frame-alist) value)
+    (dolist (frame (frame-list))
+      (set-frame-parameter frame param value))))
 
 (defun my/toggle-transparency ()
   "Toggle background transparency of the selected frame."
   (interactive)
-  (if (< (or (frame-parameter nil 'alpha-background) 100) 100)
-      (set-frame-parameter nil 'alpha-background 100)
-    (my/apply-frame-transparency)))
+  (let* ((param (my/frame-alpha-parameter))
+         (current (frame-parameter nil param))
+         (active (if (consp current) (car current) current)))
+    (if (and (numberp active) (< active 100))
+        (set-frame-parameter nil param (if (eq param 'alpha) '(100 . 100) 100))
+      (my/apply-frame-transparency))))
 
 (defun my/transparency-adjust (amount)
   "Adjust frame transparency by AMOUNT percent (negative = more transparent)."
@@ -510,3 +521,47 @@
          :desc "Seek backward" "h" #'empv-seek-backward
          :desc "Current info" "i" #'empv-current-info
          :desc "Quit" "q" #'empv-quit)))
+
+;; ── agent-shell: AI coding agents via ACP (Mistral Vibe, OpenCode) ──
+(require 'acp)
+(require 'agent-shell)
+(require 'subr-x)
+
+;; Mistral Vibe: read the API key that `vibe` stored in the OS keyring on
+;; sign-in, so no secret is duplicated into this config.
+(defun my/agent-shell-mistral-api-key ()
+  "Return the Mistral API key stored by Vibe in the Secret Service."
+  (let ((key (string-trim
+              (shell-command-to-string
+               (concat "secret-tool lookup"
+                       " application 'Python keyring library'"
+                       " service ai.mistral.vibe"
+                       " username MISTRAL_API_KEY")))))
+    (unless (string-empty-p key)
+      key)))
+
+(setq agent-shell-mistral-authentication
+      (agent-shell-mistral-make-authentication
+       :api-key #'my/agent-shell-mistral-api-key))
+
+;; Use Mistral Vibe by default for new agent shells
+(setq agent-shell-preferred-agent-config 'mistral-vibe)
+
+;; Show thought processes and tool calls expanded by default (they start
+;; collapsed otherwise). Also keep every activity group open, not just the
+;; one the agent is currently working in.
+(setq agent-shell-thought-process-expand-by-default t
+      agent-shell-tool-use-expand-by-default f
+      agent-shell-activity-group-expand-by-default t)
+
+;; Evil: review agent diffs in Emacs state so y/n/q/RET work unmodified
+(add-hook 'diff-mode-hook
+          (lambda ()
+            (when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
+              (evil-emacs-state))))
+
+(map! :leader
+      (:prefix ("A" . "AI agents")
+       :desc "Agent shell (any agent)" "a" #'agent-shell
+       :desc "Mistral Vibe agent"      "v" #'agent-shell-mistral-start-vibe
+       :desc "OpenCode agent"          "o" #'agent-shell-opencode-start-agent))
